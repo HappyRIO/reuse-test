@@ -1,0 +1,17 @@
+[Unit]
+Description=keyhunt manage daemon (API + Telegram)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/keyhunt
+ExecStart=/usr/bin/python3 -m manage.daemon
+Restart=always
+RestartSec=3
+Nice=15
+# Keep management light so finder keeps RAM/CPU
+CPUQuota=10%
+MemoryMax=64M
+
+[Install]
+WantedBy=multi-user.target

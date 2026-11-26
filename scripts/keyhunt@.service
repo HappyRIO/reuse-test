@@ -1,0 +1,17 @@
+[Unit]
+Description=keyhunt puzzle instance %i (auto-restart)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/keyhunt
+EnvironmentFile=-/root/keyhunt/scripts/keyhunt-%i.env
+ExecStart=/root/keyhunt/scripts/run-keyhunt.sh
+Restart=always
+RestartSec=5
+Nice=10
+# Optional: limit RAM so one instance cannot OOM-kill the whole box
+# MemoryMax=3G
+
+[Install]
+WantedBy=multi-user.target

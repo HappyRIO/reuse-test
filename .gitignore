@@ -1,13 +1,42 @@
+# Build / binary
 bPfile
 hexcharstoraw
 *.bin
-keyhunt
+/keyhunt
 bsgsd
 KEYFOUNDKEYFOUND.txt
 VANITYKEYFOUND.txt
 *.dat
 *.tbl
 *.blm
+
+# Secrets / local env (keep .env.example)
+.env
+.env.*
+!.env.example
+scripts/keyhunt-*.env
+
+# Runtime
+logs/
+manage/state/
+*.pid
+nohup.out
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
 
 # Prerequisites
 *.d
