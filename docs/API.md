@@ -250,19 +250,22 @@ Messages include `instance@hostname/ip`.
 
 ## Telegram command map
 
-Same controls as the API:
+Same controls as the API. Optional target: `here` | `all` | `<HOST_ID>` | `<IP>`.
 
 | Telegram | API |
 |---|---|
-| `/status` | `GET /status` |
-| `/config` | `GET /config` |
-| `/start_hunt` | `POST /start` |
-| `/stop_hunt` | `POST /stop` |
-| `/pause` | `POST /pause` |
-| `/resume` | `POST /resume` |
-| `/restart_hunt` | `POST /restart` |
-| `/threads N` | `POST /threads` |
-| `/puzzle N` | `POST /puzzle` |
+| `/hosts` | (router peer list) |
+| `/status [target]` | `GET /status` |
+| `/config [target]` | `GET /config` |
+| `/start_hunt [target]` | `POST /start` |
+| `/stop_hunt [target]` | `POST /stop` |
+| `/pause [target]` | `POST /pause` |
+| `/resume [target]` | `POST /resume` |
+| `/restart_hunt [target]` | `POST /restart` |
+| `/threads N [target]` | `POST /threads` |
+| `/puzzle N [target]` | `POST /puzzle` |
+
+Multi-host: only one machine sets `TELEGRAM_LISTEN=1` (router). Peers go in `manage/peers.json` (see `peers.example.json`). SSH `via` is supported when port 8787 is closed.
 
 ---
 

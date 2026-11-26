@@ -21,22 +21,23 @@ See [docs/INSTALL.md](../docs/INSTALL.md).
 # or: sudo systemctl enable --now keyhunt-manage
 ```
 
-## Telegram
+## Telegram (multi-host)
 
-Send `/start` to the bot once.
+Send `/start` once to the **router** host (`TELEGRAM_LISTEN=1`).  
+Other hosts use `TELEGRAM_LISTEN=0` (alerts only) + `manage/peers.json` on the router.
 
 | Command | Action |
 |---|---|
-| `/status` | running status (host + IP) |
-| `/config` | config + limits |
-| `/start_hunt` / `/resume` | start / resume |
-| `/stop_hunt` | stop |
-| `/pause` | pause |
-| `/restart_hunt` | restart |
-| `/threads N` | set threads (capped) |
-| `/puzzle N` | `140` / `145` / `150` / `155` / `160` |
+| `/hosts` | list this host + peers |
+| `/status [here\|all\|vps\|IP]` | status for one/all hosts |
+| `/config [target]` | config |
+| `/start_hunt` `/resume` `/stop_hunt` `/pause` `/restart_hunt` `[target]` | control |
+| `/threads N [target]` | set threads |
+| `/puzzle N [target]` | `140`/`145`/`150`/`155`/`160` |
 
-Alerts: **START**, **STOP**, **PAUSE**, **CRASH**, highlighted **KEY FOUND**, **DAILY STATUS** (default every 1 day).
+Examples: `/status all` · `/pause vps` · `/threads 1 vps` · `/puzzle 150 13.42.38.253`
+
+Alerts: **START**, **STOP**, **PAUSE**, **CRASH**, highlighted **KEY FOUND**, **DAILY STATUS**.
 
 ## Notes
 

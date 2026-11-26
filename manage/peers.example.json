@@ -1,0 +1,11 @@
+[
+  {
+    "id": "vps",
+    "url": "http://127.0.0.1:8787",
+    "token": "PASTE_VPS_API_TOKEN",
+    "aliases": ["vps", "13.42.38.253"],
+    "ssh": "ubuntu@13.42.38.253",
+    "ssh_key": "/root/keyhunt/Reuse Connect.pem",
+    "via": "ssh"
+  }
+]

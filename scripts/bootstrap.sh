@@ -150,18 +150,18 @@ ExecStart=$PYTHON -m manage.daemon
 Restart=always
 RestartSec=3
 Nice=15
-CPUQuota=10%
-MemoryMax=64M
+# Do NOT set MemoryMax here: starting the finder via API would inherit
+# the manage cgroup and get OOM-killed while allocating bloom filters.
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-# --- systemd: finder template (optional; manage can also start finder) ---
+# --- systemd: finder template (own cgroup; preferred on small VPS) ---
 cat > /etc/systemd/system/keyhunt@.service <<EOF
 [Unit]
 Description=keyhunt puzzle instance %i (auto-restart)
-After=network-online.target keyhunt-manage.service
+After=network-online.target
 Wants=network-online.target
 
 [Service]
@@ -171,7 +171,7 @@ EnvironmentFile=-$ROOT/scripts/keyhunt-%i.env
 ExecStart=$ROOT/scripts/run-keyhunt.sh
 Restart=always
 RestartSec=5
-Nice=10
+Nice=5
 
 [Install]
 WantedBy=multi-user.target
@@ -208,12 +208,9 @@ for i in $(seq 1 30); do
 done
 
 if [[ "$START_HUNT" -eq 1 ]]; then
-  echo "[bootstrap] starting finder via API..."
-  curl -sf -X POST \
-    -H "Authorization: Bearer ${API_TOKEN}" \
-    -H "Content-Type: application/json" \
-    "http://127.0.0.1:${API_PORT}/start" || \
-    echo "[bootstrap] WARNING: /start failed (Telegram token missing or API error)" >&2
+  echo "[bootstrap] starting finder via systemd keyhunt@${INSTANCE} (own memory cgroup)..."
+  systemctl enable --now "keyhunt@${INSTANCE}" || \
+    echo "[bootstrap] WARNING: failed to start keyhunt@${INSTANCE}" >&2
 fi
 
 echo

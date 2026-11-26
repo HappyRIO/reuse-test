@@ -45,6 +45,13 @@ class Config:
     telegram_token = _get("TELEGRAM_TOKEN", "TELEGRAM_TOEKN")
     telegram_username = _get("TELEGRAM_USERNAME")
     telegram_chat_id = _get("TELEGRAM_CHAT_ID")  # filled after /start
+    # Only ONE host should listen for Telegram commands (shared bot token).
+    # Others keep TELEGRAM_LISTEN=0 and still send outbound alerts.
+    telegram_listen = _get("TELEGRAM_LISTEN", default="1") not in ("0", "false", "False", "no")
+
+    host_id = _get("HOST_ID")  # short name, e.g. main / vps
+    public_ip = _get("PUBLIC_IP")  # e.g. 13.42.38.253 for matching
+    peers_env = _get("PEERS")  # id|url|token|aliases;...
 
     api_token = _get("API_TOKEN")
     api_host = _get("API_HOST", default="0.0.0.0")
