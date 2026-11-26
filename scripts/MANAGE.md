@@ -29,7 +29,8 @@ Other hosts use `TELEGRAM_LISTEN=0` (alerts only) + `manage/peers.json` on the r
 | Command | Action |
 |---|---|
 | `/hosts` | list this host + peers |
-| `/status [here\|all\|vps\|IP]` | status for one/all hosts |
+| `/status` | **all** instances — **one Telegram message each** |
+| `/status here\|vps\|IP` | one instance |
 | `/config [target]` | config |
 | `/start_hunt` `/resume` `/stop_hunt` `/pause` `/restart_hunt` `[target]` | control |
 | `/threads N [target]` | set threads |

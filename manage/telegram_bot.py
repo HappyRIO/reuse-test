@@ -20,8 +20,8 @@ API = "https://api.telegram.org/bot{token}/{method}"
 HELP = """keyhunt multi-host bot
 router: [{tag}]  id={hid}
 
-Target any host:
-  /status [here|all|<id>|<ip>]
+  /status              — all instances (1 Telegram msg each)
+  /status here|vps|IP  — one instance
   /config [target]
   /pause [target]
   /resume [target]
@@ -34,11 +34,9 @@ Target any host:
 
 Examples:
   /status
-  /status all
   /status vps
   /pause 13.42.38.253
   /threads 1 vps
-  /puzzle 150 vps
 
 Known puzzles: {puzzles}
 Only this router listens for commands (TELEGRAM_LISTEN=1)."""
@@ -234,14 +232,15 @@ class TelegramBot:
             )
         return f"unknown action {action}"
 
-    def dispatch(self, action: str, target: str | None, args: list[str]) -> str:
+    def dispatch(self, action: str, target: str | None, args: list[str]) -> str | list[str]:
         t = (target or "here").strip().lower()
 
         if t == "all":
-            chunks = [f"=== {hosts.host_id()} (here) ===\n{self._run_local(action, args)}"]
+            # One Telegram message per instance
+            msgs = [f"[{hosts.host_id()}]\n{self._run_local(action, args)}"]
             for peer in hosts.load_peers():
-                chunks.append(f"=== {peer['id']} ===\n{self._run_peer(peer, action, args)}")
-            return "\n\n".join(chunks)
+                msgs.append(self._run_peer(peer, action, args))
+            return msgs
 
         if hosts.is_local_target(t):
             return self._run_local(action, args)
@@ -255,7 +254,7 @@ class TelegramBot:
             )
         return self._run_peer(peer, action, args)
 
-    def handle_command(self, chat_id: str, text: str) -> str:
+    def handle_command(self, chat_id: str, text: str) -> str | list[str]:
         parts = (text or "").strip().split()
         if not parts:
             return "Empty command. Try /help"
@@ -291,14 +290,24 @@ class TelegramBot:
 
         if action in ("threads", "puzzle"):
             target, rest = _split_target(args)
-            # rest should contain the numeric arg
             if not rest and args and args[0].lstrip("-").isdigit():
                 rest = [args[0]]
                 target = args[1] if len(args) > 1 else target
             return self.dispatch(action, target, rest)
 
         target, rest = _split_target(args)
+        # Bare /status => all instances (one message each)
+        if action == "status" and target is None:
+            target = "all"
         return self.dispatch(action, target, rest)
+
+    def _send_reply(self, chat_id: str, reply: str | list[str]) -> None:
+        parts = reply if isinstance(reply, list) else [reply]
+        for msg in parts:
+            text = msg or ""
+            while text:
+                chunk, text = text[:4000], text[4000:]
+                self.send(chunk, chat_id=chat_id, prefix_host=False)
 
     def poll_once(self) -> None:
         res = self._call(
@@ -320,10 +329,7 @@ class TelegramBot:
                 continue
             if text.startswith("/"):
                 reply = self.handle_command(str(chat_id), text)
-                # split long replies
-                while reply:
-                    chunk, reply = reply[:4000], reply[4000:]
-                    self.send(chunk, chat_id=str(chat_id), prefix_host=False)
+                self._send_reply(str(chat_id), reply)
 
     def run_forever(self) -> None:
         while not self._stop.is_set():
